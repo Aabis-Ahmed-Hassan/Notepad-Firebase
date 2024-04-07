@@ -13,7 +13,7 @@ class AddNoteClass {
     Map<String, dynamic> data = {
       'title': title,
       'description': description,
-      'postId': noteId,
+      'noteId': noteId,
       'uid': uid,
     };
     try {
