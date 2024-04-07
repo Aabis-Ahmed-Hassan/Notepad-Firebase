@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:notepad_with_firebase/utils/utils.dart';
 import 'package:notepad_with_firebase/view_model/add_note_class.dart';
 
 import '../utils/components/my_button.dart';
@@ -17,7 +18,19 @@ class _AddNoteState extends State<AddNote> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
 
+  final _titleFocusNode = FocusNode();
+  final _descriptionFocusNode = FocusNode();
   String uid = FirebaseAuth.instance.currentUser!.uid;
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _titleController.dispose();
+    _descriptionController.dispose();
+    _titleFocusNode.dispose();
+    _descriptionFocusNode.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height * 1;
@@ -38,7 +51,12 @@ class _AddNoteState extends State<AddNote> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             TextFormField(
+              focusNode: _titleFocusNode,
               controller: _titleController,
+              onFieldSubmitted: (val) {
+                Utils.changeFocus(
+                    _titleFocusNode, _descriptionFocusNode, context);
+              },
               decoration: InputDecoration(
                 label: Text(
                   'Title',
@@ -50,6 +68,7 @@ class _AddNoteState extends State<AddNote> {
               height: height * 0.01,
             ),
             TextFormField(
+              focusNode: _descriptionFocusNode,
               controller: _descriptionController,
               decoration: InputDecoration(
                 label: Text(

@@ -10,4 +10,10 @@ class Utils {
       ),
     );
   }
+
+  static changeFocus(
+      FocusNode previousFocus, FocusNode nextFocus, BuildContext context) {
+    previousFocus.unfocus();
+    Focus.of(context).requestFocus(nextFocus);
+  }
 }

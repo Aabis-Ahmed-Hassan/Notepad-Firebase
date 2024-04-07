@@ -17,6 +17,9 @@ class SignUp extends StatefulWidget {
 class _SignUpState extends State<SignUp> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _emailFocusNode = FocusNode();
+  final _passwordFocusNode = FocusNode();
+
   @override
   void dispose() {
     // TODO: implement dispose
@@ -24,6 +27,9 @@ class _SignUpState extends State<SignUp> {
 
     _emailController.dispose();
     _passwordController.dispose();
+    _emailFocusNode.dispose();
+    _passwordController.dispose();
+
   }
 
   bool _loading = false;
@@ -56,7 +62,11 @@ class _SignUpState extends State<SignUp> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextFormField(
+focusNode: _emailFocusNode,
               controller: _emailController,
+              onFieldSubmitted: (val) {
+  Utils.changeFocus(_emailFocusNode, _passwordFocusNode, context);
+              },
               decoration: InputDecoration(
                 label: Text('Email'),
                 hintText: 'Please enter your email',
@@ -66,6 +76,7 @@ class _SignUpState extends State<SignUp> {
               height: height * 0.01,
             ),
             TextFormField(
+              focusNode: _passwordFocusNode,
               controller: _passwordController,
               decoration: InputDecoration(
                 label: Text('Password'),
