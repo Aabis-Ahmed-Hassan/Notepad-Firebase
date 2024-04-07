@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:notepad_with_firebase/view/login.dart';
+import 'package:notepad_with_firebase/view/splash_screen.dart';
 import 'package:notepad_with_firebase/view_model/auth_methods.dart';
+import 'package:notepad_with_firebase/view_model/loading_provider.dart';
+import 'package:provider/provider.dart';
 
 import '../utils/components/my_button.dart';
 import '../utils/constants/colors.dart';
 import '../utils/utils.dart';
-import 'home_screen.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
@@ -15,8 +17,8 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
   final _emailFocusNode = FocusNode();
   final _passwordFocusNode = FocusNode();
 
@@ -25,23 +27,18 @@ class _SignUpState extends State<SignUp> {
     // TODO: implement dispose
     super.dispose();
 
-    _emailController.dispose();
-    _passwordController.dispose();
+    _emailController.text = '';
+    _passwordController.text = '';
     _emailFocusNode.dispose();
     _passwordController.dispose();
   }
 
-  bool _loading = false;
-  Future<void> signup(String email, String password) async {
-    setState(() {
-      _loading = true;
-    });
-
+  Future<void> signup(
+      String email, String password, LoadingProvider _loadingProvider) async {
+    _loadingProvider.setLoading(true);
     await AuthMethods().signUpUser(email, password);
 
-    setState(() {
-      _loading = false;
-    });
+    _loadingProvider.setLoading(false);
   }
 
   @override
@@ -49,6 +46,8 @@ class _SignUpState extends State<SignUp> {
     double height = MediaQuery.of(context).size.height * 1;
     double width = MediaQuery.of(context).size.width * 1;
 
+    final _loadingProvider =
+        Provider.of<LoadingProvider>(context, listen: false);
     print('Signup Screen');
     return Scaffold(
       appBar: AppBar(
@@ -93,11 +92,12 @@ class _SignUpState extends State<SignUp> {
                 await signup(
                   _emailController.text,
                   _passwordController.text,
+                  _loadingProvider,
                 ).then((value) {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => HomeScreen(),
+                      builder: (context) => SplashScreen(),
                     ),
                   );
                 }).onError((error, stackTrace) {
@@ -105,7 +105,7 @@ class _SignUpState extends State<SignUp> {
                   Utils.showSnackBar(context, 'Error');
                 });
               },
-              loading: _loading,
+              loading: _loadingProvider.loading,
             ),
             SizedBox(
               height: height * 0.03,

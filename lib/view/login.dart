@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:notepad_with_firebase/utils/components/my_button.dart';
 import 'package:notepad_with_firebase/utils/utils.dart';
-import 'package:notepad_with_firebase/view/home_screen.dart';
 import 'package:notepad_with_firebase/view/signup.dart';
+import 'package:notepad_with_firebase/view/splash_screen.dart';
 import 'package:notepad_with_firebase/view_model/auth_methods.dart';
 import 'package:notepad_with_firebase/view_model/loading_provider.dart';
 import 'package:provider/provider.dart';
@@ -17,8 +17,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
 
   final _emailFocusNode = FocusNode();
   final _passwordFocusNode = FocusNode();
@@ -36,8 +36,8 @@ class _LoginScreenState extends State<LoginScreen> {
     // TODO: implement dispose
     super.dispose();
 
-    _emailController.dispose();
-    _passwordController.dispose();
+    _emailController.text = '';
+    _passwordController.text = '';
     _emailFocusNode.dispose();
     _passwordController.dispose();
   }
@@ -87,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
             SizedBox(
               height: height * 0.05,
             ),
-            Consumer<LoadingProvider>(builder: (context, provider, child) {
+            Consumer(builder: (context, provider, child) {
               return MyButton(
                 title: 'Log In',
                 onTap: () async {
@@ -99,14 +99,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => HomeScreen(),
+                        builder: (context) => SplashScreen(),
                       ),
                     );
                   }).onError((error, stackTrace) {
                     Utils.showSnackBar(context, 'Error');
                   });
                 },
-                loading: provider.loading,
+                loading: _loadingProvider.loading,
               );
             }),
             SizedBox(
