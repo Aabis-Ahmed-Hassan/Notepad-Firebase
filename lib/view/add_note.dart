@@ -2,9 +2,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:notepad_with_firebase/utils/utils.dart';
 import 'package:notepad_with_firebase/view_model/add_note_class.dart';
+import 'package:provider/provider.dart';
 
 import '../utils/components/my_button.dart';
 import '../utils/constants/colors.dart';
+import '../view_model/home_provider.dart';
 
 class AddNote extends StatefulWidget {
   const AddNote({super.key});
@@ -36,6 +38,7 @@ class _AddNoteState extends State<AddNote> {
     double height = MediaQuery.of(context).size.height * 1;
     double width = MediaQuery.of(context).size.width * 1;
 
+    final _homepageProvider = Provider.of<HomeProvider>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         title: Text('Add Note'),
@@ -86,8 +89,14 @@ class _AddNoteState extends State<AddNote> {
                 setState(() {
                   _loading = true;
                 });
-                await AddNoteClass().add(uid, _titleController.text,
-                    _descriptionController.text, context);
+                await AddNoteClass()
+                    .add(uid, _titleController.text,
+                        _descriptionController.text, context)
+                    .then((value) async {
+                  await _homepageProvider.refreshNotes();
+                }).onError((error, stackTrace) {
+                  Utils.showSnackBar(context, 'Error');
+                });
                 setState(
                   () {
                     _loading = false;
