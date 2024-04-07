@@ -4,6 +4,8 @@ import 'package:notepad_with_firebase/utils/utils.dart';
 import 'package:notepad_with_firebase/view/home_screen.dart';
 import 'package:notepad_with_firebase/view/signup.dart';
 import 'package:notepad_with_firebase/view_model/auth_methods.dart';
+import 'package:notepad_with_firebase/view_model/loading_provider.dart';
+import 'package:provider/provider.dart';
 
 import '../utils/constants/colors.dart';
 
@@ -21,6 +23,14 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailFocusNode = FocusNode();
   final _passwordFocusNode = FocusNode();
 
+  Future<void> login(
+      String email, String password, LoadingProvider _loadingProvider) async {
+    _loadingProvider.setLoading(true);
+
+    await AuthMethods().loginUser(email, password);
+    _loadingProvider.setLoading(false);
+  }
+
   @override
   void dispose() {
     // TODO: implement dispose
@@ -32,21 +42,13 @@ class _LoginScreenState extends State<LoginScreen> {
     _passwordController.dispose();
   }
 
-  bool _loading = false;
-  Future<void> login(String email, String password) async {
-    setState(() {
-      _loading = true;
-    });
-    await AuthMethods().loginUser(email, password);
-    setState(() {
-      _loading = false;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height * 1;
     double width = MediaQuery.of(context).size.width * 1;
+    final _loadingProvider =
+        Provider.of<LoadingProvider>(context, listen: false);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Login'),
@@ -84,25 +86,28 @@ class _LoginScreenState extends State<LoginScreen> {
             SizedBox(
               height: height * 0.05,
             ),
-            MyButton(
-              title: 'Log In',
-              onTap: () async {
-                await login(
-                  _emailController.text,
-                  _passwordController.text,
-                ).then((value) {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => HomeScreen(),
-                    ),
-                  );
-                }).onError((error, stackTrace) {
-                  Utils.showSnackBar(context, 'Error');
-                });
-              },
-              loading: _loading,
-            ),
+            Consumer<LoadingProvider>(builder: (context, provider, child) {
+              return MyButton(
+                title: 'Log In',
+                onTap: () async {
+                  await login(
+                    _emailController.text,
+                    _passwordController.text,
+                    _loadingProvider,
+                  ).then((value) {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => HomeScreen(),
+                      ),
+                    );
+                  }).onError((error, stackTrace) {
+                    Utils.showSnackBar(context, 'Error');
+                  });
+                },
+                loading: provider.loading,
+              );
+            }),
             SizedBox(
               height: height * 0.03,
             ),

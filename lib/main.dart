@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:notepad_with_firebase/firebase_options.dart';
 import 'package:notepad_with_firebase/view/splash_screen.dart';
 import 'package:notepad_with_firebase/view_model/home_provider.dart';
+import 'package:notepad_with_firebase/view_model/loading_provider.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -20,8 +21,11 @@ class MyApp extends StatelessWidget {
   var _fbAuth = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => HomeProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => LoadingProvider()),
+        ChangeNotifierProvider(create: (_) => HomeProvider()),
+      ],
       child: MaterialApp(
         home: SplashScreen(),
       ),
