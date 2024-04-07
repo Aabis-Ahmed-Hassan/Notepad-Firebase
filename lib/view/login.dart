@@ -48,6 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
     double width = MediaQuery.of(context).size.width * 1;
     final _loadingProvider =
         Provider.of<LoadingProvider>(context, listen: false);
+    print('Login Screen');
 
     return Scaffold(
       appBar: AppBar(

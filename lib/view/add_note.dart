@@ -39,6 +39,7 @@ class _AddNoteState extends State<AddNote> {
     double width = MediaQuery.of(context).size.width * 1;
 
     final _homepageProvider = Provider.of<HomeProvider>(context, listen: false);
+    print('Add Notes Screen');
     return Scaffold(
       appBar: AppBar(
         title: Text('Add Note'),

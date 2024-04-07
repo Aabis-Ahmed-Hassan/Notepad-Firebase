@@ -29,7 +29,6 @@ class _SignUpState extends State<SignUp> {
     _passwordController.dispose();
     _emailFocusNode.dispose();
     _passwordController.dispose();
-
   }
 
   bool _loading = false;
@@ -49,6 +48,8 @@ class _SignUpState extends State<SignUp> {
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height * 1;
     double width = MediaQuery.of(context).size.width * 1;
+
+    print('Signup Screen');
     return Scaffold(
       appBar: AppBar(
         title: Text('Sign Up'),
@@ -62,10 +63,10 @@ class _SignUpState extends State<SignUp> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextFormField(
-focusNode: _emailFocusNode,
+              focusNode: _emailFocusNode,
               controller: _emailController,
               onFieldSubmitted: (val) {
-  Utils.changeFocus(_emailFocusNode, _passwordFocusNode, context);
+                Utils.changeFocus(_emailFocusNode, _passwordFocusNode, context);
               },
               decoration: InputDecoration(
                 label: Text('Email'),
