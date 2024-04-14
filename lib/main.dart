@@ -29,6 +29,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => SignupProvider()),
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         home: SplashScreen(),
       ),
     );
