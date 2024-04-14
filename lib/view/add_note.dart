@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:notepad_with_firebase/utils/utils.dart';
 import 'package:notepad_with_firebase/view_model/add_note_class.dart';
+import 'package:notepad_with_firebase/view_model/loading_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../utils/components/my_button.dart';
@@ -39,6 +40,8 @@ class _AddNoteState extends State<AddNote> {
     double width = MediaQuery.of(context).size.width * 1;
 
     final _homepageProvider = Provider.of<HomeProvider>(context, listen: false);
+    final _loadingProvider =
+        Provider.of<LoadingProvider>(context, listen: false);
     print('Add Notes Screen');
     return Scaffold(
       appBar: AppBar(
@@ -84,28 +87,24 @@ class _AddNoteState extends State<AddNote> {
             SizedBox(
               height: height * 0.05,
             ),
-            MyButton(
-              title: 'Add Note',
-              onTap: () async {
-                setState(() {
-                  _loading = true;
-                });
-                await AddNoteClass()
-                    .add(uid, _titleController.text,
-                        _descriptionController.text, context)
-                    .then((value) async {
-                  await _homepageProvider.refreshNotes();
-                }).onError((error, stackTrace) {
-                  Utils.showSnackBar(context, 'Error');
-                });
-                setState(
-                  () {
-                    _loading = false;
-                  },
-                );
-              },
-              loading: _loading,
-            ),
+            Consumer(builder: (context, provider, child) {
+              return MyButton(
+                title: 'Add Note',
+                onTap: () async {
+                  _loadingProvider.setLoading(true);
+                  await AddNoteClass()
+                      .add(uid, _titleController.text,
+                          _descriptionController.text, context)
+                      .then((value) async {
+                    await _homepageProvider.refreshNotes();
+                  }).onError((error, stackTrace) {
+                    Utils.showSnackBar(context, 'Error');
+                  });
+                  _loadingProvider.setLoading(false);
+                },
+                loading: _loading,
+              );
+            }),
           ],
         ),
       ),

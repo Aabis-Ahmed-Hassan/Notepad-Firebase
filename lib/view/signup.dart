@@ -36,7 +36,7 @@ class _SignUpState extends State<SignUp> {
   Future<void> signup(
       String email, String password, LoadingProvider _loadingProvider) async {
     _loadingProvider.setLoading(true);
-    await AuthMethods().signUpUser(email, password);
+    await AuthMethods(context).signUpUser(email, password);
 
     _loadingProvider.setLoading(false);
   }
@@ -86,27 +86,29 @@ class _SignUpState extends State<SignUp> {
             SizedBox(
               height: height * 0.05,
             ),
-            MyButton(
-              title: 'Sign Up',
-              onTap: () async {
-                await signup(
-                  _emailController.text,
-                  _passwordController.text,
-                  _loadingProvider,
-                ).then((value) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => SplashScreen(),
-                    ),
-                  );
-                }).onError((error, stackTrace) {
-                  print(error);
-                  Utils.showSnackBar(context, 'Error');
-                });
-              },
-              loading: _loadingProvider.loading,
-            ),
+            Consumer<LoadingProvider>(builder: (context, provider, child) {
+              return MyButton(
+                title: 'Sign Up',
+                onTap: () async {
+                  await signup(
+                    _emailController.text,
+                    _passwordController.text,
+                    _loadingProvider,
+                  ).then((value) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SplashScreen(),
+                      ),
+                    );
+                  }).onError((error, stackTrace) {
+                    print(error);
+                    Utils.showSnackBar(context, 'Error');
+                  });
+                },
+                loading: _loadingProvider.loading,
+              );
+            }),
             SizedBox(
               height: height * 0.03,
             ),

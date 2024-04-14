@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:notepad_with_firebase/utils/components/my_button.dart';
 import 'package:notepad_with_firebase/utils/utils.dart';
 import 'package:notepad_with_firebase/view/signup.dart';
-import 'package:notepad_with_firebase/view/splash_screen.dart';
 import 'package:notepad_with_firebase/view_model/auth_methods.dart';
 import 'package:notepad_with_firebase/view_model/loading_provider.dart';
 import 'package:provider/provider.dart';
@@ -23,13 +22,13 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailFocusNode = FocusNode();
   final _passwordFocusNode = FocusNode();
 
-  Future<void> login(
-      String email, String password, LoadingProvider _loadingProvider) async {
-    _loadingProvider.setLoading(true);
-
-    await AuthMethods().loginUser(email, password);
-    _loadingProvider.setLoading(false);
-  }
+  // Future<void> login(
+  //     String email, String password, LoadingProvider _loadingProvider) async {
+  //   _loadingProvider.setLoading(true);
+  //
+  //   await AuthMethods().loginUser(email, password);
+  //   _loadingProvider.setLoading(false);
+  // }
 
   @override
   void dispose() {
@@ -87,24 +86,12 @@ class _LoginScreenState extends State<LoginScreen> {
             SizedBox(
               height: height * 0.05,
             ),
-            Consumer(builder: (context, provider, child) {
+            Consumer<LoadingProvider>(builder: (context, provider, child) {
               return MyButton(
                 title: 'Log In',
                 onTap: () async {
-                  await login(
-                    _emailController.text,
-                    _passwordController.text,
-                    _loadingProvider,
-                  ).then((value) {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SplashScreen(),
-                      ),
-                    );
-                  }).onError((error, stackTrace) {
-                    Utils.showSnackBar(context, 'Error');
-                  });
+                  await AuthMethods(context).loginUser(
+                      _emailController.text, _passwordController.text, context);
                 },
                 loading: _loadingProvider.loading,
               );

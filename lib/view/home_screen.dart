@@ -5,6 +5,8 @@ import 'package:notepad_with_firebase/utils/constants/colors.dart';
 import 'package:notepad_with_firebase/utils/utils.dart';
 import 'package:notepad_with_firebase/view/add_note.dart';
 import 'package:notepad_with_firebase/view/login.dart';
+import 'package:notepad_with_firebase/view_model/home_provider.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,18 +18,26 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _titleFocusNode = FocusNode();
+  final _descriptionFocusNode = FocusNode();
+
   @override
   void dispose() {
     // TODO: implement dispose
     super.dispose();
     _titleController.dispose();
     _descriptionController.dispose();
+    _titleFocusNode.dispose();
+    _descriptionFocusNode.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height * 1;
     double width = MediaQuery.of(context).size.width * 1;
+
+    final _homepageProvider = Provider.of<HomeProvider>(context);
+    print('HomeScreen');
     return Scaffold(
       appBar: AppBar(
         title: Text('My Notepad'),
@@ -52,6 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Icons.logout,
             ),
           ),
+          SizedBox(width: width * 0.05),
         ],
       ),
       body: RefreshIndicator(
@@ -62,80 +73,78 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         child: Column(
           children: [
-            Expanded(
-              child: FutureBuilder(
-                  future: FirebaseFirestore.instance
-                      .collection('Users')
-                      .doc(FirebaseAuth.instance.currentUser!.uid)
-                      .collection('Notes')
-                      .get(),
-                  builder: (context,
-                      AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
-                          snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    } else {
-                      return ListView.builder(
-                        itemCount: snapshot.data!.docs.length,
-                        itemBuilder: (context, index) {
-                          int reversedIndex =
-                              snapshot.data!.docs.length - index - 1;
-                          var jsonData = snapshot.data!.docs[reversedIndex];
-                          return ListTile(
-                            title: Text(jsonData['title'].toString()),
-                            subtitle: Text(jsonData['description'].toString()),
-                            trailing: PopupMenuButton(itemBuilder: (context) {
-                              return [
-                                PopupMenuItem(
-                                  onTap: () {
-                                    showDialogBox(
-                                      jsonData['title'].toString(),
-                                      jsonData['description'].toString(),
-                                      jsonData['uid'].toString(),
-                                      jsonData['noteId'].toString(),
-                                    );
-                                  },
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.edit,
-                                      ),
-                                      SizedBox(width: width * 0.025),
-                                      Text(
-                                        'Edit',
-                                      ),
-                                    ],
+            Consumer<HomeProvider>(builder: (context, provider, child) {
+              return Expanded(
+                child: FutureBuilder(
+                    future: provider.allNotes,
+                    builder: (context,
+                        AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
+                            snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      } else {
+                        return ListView.builder(
+                          itemCount: snapshot.data!.docs.length,
+                          itemBuilder: (context, index) {
+                            int reversedIndex =
+                                snapshot.data!.docs.length - index - 1;
+                            var jsonData = snapshot.data!.docs[index];
+                            return ListTile(
+                              title: Text(jsonData['title'].toString()),
+                              subtitle:
+                                  Text(jsonData['description'].toString()),
+                              trailing: PopupMenuButton(itemBuilder: (context) {
+                                return [
+                                  PopupMenuItem(
+                                    onTap: () {
+                                      showDialogBox(
+                                        jsonData['title'].toString(),
+                                        jsonData['description'].toString(),
+                                        jsonData['uid'].toString(),
+                                        jsonData['noteId'].toString(),
+                                      );
+                                    },
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.edit,
+                                        ),
+                                        SizedBox(width: width * 0.025),
+                                        Text(
+                                          'Edit',
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                PopupMenuItem(
-
-
-                                  onTap: () async {
-                                    await deleteNode(jsonData['uid'].toString(),
-                                        jsonData['noteId'].toString());
-                                  },
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.delete,
-                                      ),
-                                      SizedBox(width: width * 0.025),
-                                      Text(
-                                        'Delete',
-                                      ),
-                                    ],
+                                  PopupMenuItem(
+                                    onTap: () async {
+                                      await deleteNode(
+                                          jsonData['uid'].toString(),
+                                          jsonData['noteId'].toString());
+                                    },
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.delete,
+                                        ),
+                                        SizedBox(width: width * 0.025),
+                                        Text(
+                                          'Delete',
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              ];
-                            }),
-                          );
-                        },
-                      );
-                    }
-                  }),
-            ),
+                                ];
+                              }),
+                            );
+                          },
+                        );
+                      }
+                    }),
+              );
+            }),
           ],
         ),
       ),
@@ -169,12 +178,18 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               TextFormField(
+                focusNode: _titleFocusNode,
+                onFieldSubmitted: (val) {
+                  Utils.changeFocus(
+                      _titleFocusNode, _descriptionFocusNode, context);
+                },
                 controller: _titleController,
                 decoration: InputDecoration(
                   label: Text('Title'),
                 ),
               ),
               TextFormField(
+                focusNode: _descriptionFocusNode,
                 controller: _descriptionController,
                 decoration: InputDecoration(
                   label: Text('Description'),
@@ -208,6 +223,8 @@ class _HomeScreenState extends State<HomeScreen> {
     String uid,
     String noteId,
   ) async {
+    final _homepageProvider = Provider.of<HomeProvider>(context, listen: false);
+
     Map<String, dynamic> data = {
       'title': title,
       'description': description,
@@ -220,30 +237,30 @@ class _HomeScreenState extends State<HomeScreen> {
         .collection('Notes')
         .doc(noteId)
         .set(data)
-        .then((value) {
+        .then((value) async {
       Navigator.pop(context);
-      setState(() {});
+
+      await _homepageProvider.refreshNotes();
     }).onError((error, stackTrace) {
       Navigator.pop(context);
       Utils.showSnackBar(context, 'Error');
-      setState(() {});
     });
   }
 
   Future<void> deleteNode(String uid, String noteId) async {
+    final _homepageProvider = Provider.of<HomeProvider>(context, listen: false);
     await FirebaseFirestore.instance
         .collection('Users')
         .doc(uid)
         .collection('Notes')
         .doc(noteId)
         .delete()
-        .then((value) {
+        .then((value) async {
       Navigator.pop(context);
-      setState(() {});
+      await _homepageProvider.refreshNotes();
     }).onError((error, stackTrace) {
       Navigator.pop(context);
       Utils.showSnackBar(context, 'Error');
     });
   }
-
 }
