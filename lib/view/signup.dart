@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:notepad_with_firebase/view/login.dart';
-import 'package:notepad_with_firebase/view/splash_screen.dart';
 import 'package:notepad_with_firebase/view_model/auth_methods.dart';
-import 'package:notepad_with_firebase/view_model/loading_provider.dart';
+import 'package:notepad_with_firebase/view_model/signup_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../utils/components/my_button.dart';
@@ -33,13 +32,13 @@ class _SignUpState extends State<SignUp> {
     _passwordController.dispose();
   }
 
-  Future<void> signup(
-      String email, String password, LoadingProvider _loadingProvider) async {
-    _loadingProvider.setLoading(true);
-    await AuthMethods(context).signUpUser(email, password);
-
-    _loadingProvider.setLoading(false);
-  }
+  // Future<void> signup(
+  //     String email, String password,  _loadingProvider) async {
+  //   _loadingProvider.setLoading(true);
+  //   await AuthMethods(context).signUpUser(email, password);
+  //
+  //   _loadingProvider.setLoading(false);
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +46,7 @@ class _SignUpState extends State<SignUp> {
     double width = MediaQuery.of(context).size.width * 1;
 
     final _loadingProvider =
-        Provider.of<LoadingProvider>(context, listen: false);
+        Provider.of<SignupProvider>(context, listen: false);
     print('Signup Screen');
     return Scaffold(
       appBar: AppBar(
@@ -86,25 +85,12 @@ class _SignUpState extends State<SignUp> {
             SizedBox(
               height: height * 0.05,
             ),
-            Consumer<LoadingProvider>(builder: (context, provider, child) {
+            Consumer<SignupProvider>(builder: (context, provider, child) {
               return MyButton(
                 title: 'Sign Up',
                 onTap: () async {
-                  await signup(
-                    _emailController.text,
-                    _passwordController.text,
-                    _loadingProvider,
-                  ).then((value) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SplashScreen(),
-                      ),
-                    );
-                  }).onError((error, stackTrace) {
-                    print(error);
-                    Utils.showSnackBar(context, 'Error');
-                  });
+                  await AuthMethods(context).signUpUser(
+                      _emailController.text, _passwordController.text, context);
                 },
                 loading: _loadingProvider.loading,
               );

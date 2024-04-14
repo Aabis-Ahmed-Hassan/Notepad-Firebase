@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:notepad_with_firebase/utils/utils.dart';
 import 'package:notepad_with_firebase/view_model/add_note_class.dart';
-import 'package:notepad_with_firebase/view_model/loading_provider.dart';
+import 'package:notepad_with_firebase/view_model/login_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../utils/components/my_button.dart';
@@ -40,8 +40,7 @@ class _AddNoteState extends State<AddNote> {
     double width = MediaQuery.of(context).size.width * 1;
 
     final _homepageProvider = Provider.of<HomeProvider>(context, listen: false);
-    final _loadingProvider =
-        Provider.of<LoadingProvider>(context, listen: false);
+    final _loadingProvider = Provider.of<LoginProvider>(context, listen: false);
     print('Add Notes Screen');
     return Scaffold(
       appBar: AppBar(

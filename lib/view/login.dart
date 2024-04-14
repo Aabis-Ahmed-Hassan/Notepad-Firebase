@@ -3,7 +3,7 @@ import 'package:notepad_with_firebase/utils/components/my_button.dart';
 import 'package:notepad_with_firebase/utils/utils.dart';
 import 'package:notepad_with_firebase/view/signup.dart';
 import 'package:notepad_with_firebase/view_model/auth_methods.dart';
-import 'package:notepad_with_firebase/view_model/loading_provider.dart';
+import 'package:notepad_with_firebase/view_model/login_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../utils/constants/colors.dart';
@@ -45,8 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height * 1;
     double width = MediaQuery.of(context).size.width * 1;
-    final _loadingProvider =
-        Provider.of<LoadingProvider>(context, listen: false);
+    final _loadingProvider = Provider.of<LoginProvider>(context, listen: false);
     print('Login Screen');
 
     return Scaffold(
@@ -86,7 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
             SizedBox(
               height: height * 0.05,
             ),
-            Consumer<LoadingProvider>(builder: (context, provider, child) {
+            Consumer<LoginProvider>(builder: (context, provider, child) {
               return MyButton(
                 title: 'Log In',
                 onTap: () async {
