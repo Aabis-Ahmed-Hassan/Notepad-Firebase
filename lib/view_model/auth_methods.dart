@@ -14,6 +14,7 @@ class AuthMethods {
 
   LoginProvider? _loginProvider;
   SignupProvider? _signupProvider;
+
   AuthMethods(BuildContext context) {
     _loginProvider = Provider.of<LoginProvider>(context, listen: false);
     _signupProvider = Provider.of<SignupProvider>(context, listen: false);
@@ -38,29 +39,23 @@ class AuthMethods {
       String email, String password, BuildContext context) async {
     _signupProvider!.setLoading(true);
 
-    UserCredential? currentUser = await _fbAuth
-        .createUserWithEmailAndPassword(email: email, password: password)
-        .then((value) {})
-        .onError((error, stackTrace) {
-      _signupProvider!.setLoading(false);
+    UserCredential currentUser = await _fbAuth.createUserWithEmailAndPassword(
+        email: email, password: password);
 
+    print('user is registered successfully');
+    Map<String, dynamic> data = {
+      'email': email,
+      'uid': currentUser!.user!.uid,
+    };
+    await _ref.doc(currentUser.user!.uid).set(data).then((value) {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => SplashScreen()));
+    }).onError((error, stackTrace) {
       Utils.showSnackBar(context, 'Error');
     });
+    print('firestore registration is done');
 
-    if (currentUser != null) {
-      Map<String, dynamic> data = {
-        'email': email,
-        'uid': currentUser!.user!.uid,
-      };
-      await _ref.doc(currentUser.user!.uid).set(data).then((value) {
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => SplashScreen()));
-      }).onError((error, stackTrace) {
-        Utils.showSnackBar(context, 'Error');
-      });
-
-      _signupProvider!.setLoading(false);
-    }
+    _signupProvider!.setLoading(false);
     // return currentUser.user!.uid;
   }
 }
