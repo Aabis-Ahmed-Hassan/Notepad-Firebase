@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import '../utils/components/my_button.dart';
 import '../utils/constants/colors.dart';
 import '../view_model/home_provider.dart';
+import '../view_model/add_note_provider.dart';
 
 class AddNote extends StatefulWidget {
   const AddNote({super.key});
@@ -17,7 +18,6 @@ class AddNote extends StatefulWidget {
 }
 
 class _AddNoteState extends State<AddNote> {
-  bool _loading = false;
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
 
@@ -40,7 +40,7 @@ class _AddNoteState extends State<AddNote> {
     double width = MediaQuery.of(context).size.width * 1;
 
     final _homepageProvider = Provider.of<HomeProvider>(context, listen: false);
-    final _loadingProvider = Provider.of<LoginProvider>(context, listen: false);
+    final _loadingProvider = Provider.of<AddNoteProvider>(context, listen: false);
     print('Add Notes Screen');
     return Scaffold(
       appBar: AppBar(
@@ -86,7 +86,7 @@ class _AddNoteState extends State<AddNote> {
             SizedBox(
               height: height * 0.05,
             ),
-            Consumer(builder: (context, provider, child) {
+            Consumer<AddNoteProvider>(builder: (context, provider, child) {
               return MyButton(
                 title: 'Add Note',
                 onTap: () async {
@@ -98,12 +98,12 @@ class _AddNoteState extends State<AddNote> {
                     await _homepageProvider.refreshNotes();
                   }).onError((error, stackTrace) {
                     Utils.showSnackBar(context, 'Error');
-                  });
+                  },);
                   _loadingProvider.setLoading(false);
                 },
-                loading: _loading,
+                loading: provider.loading,
               );
-            }),
+            },),
           ],
         ),
       ),

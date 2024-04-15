@@ -36,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
     double height = MediaQuery.of(context).size.height * 1;
     double width = MediaQuery.of(context).size.width * 1;
 
-    final _homepageProvider = Provider.of<HomeProvider>(context);
+    final _allNotesProvider = Provider.of<HomeProvider>(context);
     print('HomeScreen');
     return Scaffold(
       appBar: AppBar(
